@@ -1,0 +1,143 @@
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QWidget, QApplication, QRadioButton, QHBoxLayout, QPushButton, QLabel, QVBoxLayout, QGroupBox, QButtonGroup
+from random import shuffle
+from random import randint
+class Question():
+    def __init__(self, question, right_answer, wrong1, wrong2, wrong3):
+        self.question = question
+        self.right_answer = right_answer
+        self.wrong1 = wrong1
+        self.wrong2 = wrong2
+        self.wrong3 = wrong3
+
+question_list = []
+q1 = Question('Государственный язык Португалии', 'Португалский', 'Английский', 'Испанский', 'Французсуий')
+question_list.append(q1)
+q2 = Question('Какого цвета нет в флаге Казахстана', 'Синий', 'Жёлтый', 'Красный', 'Феолетовый')
+question_list.append(q2)
+q3 = Question('Снились ли вам сны, которые вы запомнили на всю жизнь?', 'Да', 'Точно да', 'Конечно', 'Однозначно')
+question_list.append(q3)
+q4 = Question('Кто ты?', 'Динозавр', 'Человек', 'Просто динозавр', 'Феолетовый')
+question_list.append(q4)
+q5 = Question('Какая игра лучше?', 'У каждого свои вкусы', 'Майнкрафт', 'Фортнайт', 'Пубг')
+question_list.append(q5)
+q6 = Question('Твой IQ?', '100', '0', '70', '3')
+question_list.append(q6)
+q7 = Question('Кто я?', 'Человек', 'Марсианин', 'Просто динозавр', 'Феолетовый')
+question_list.append(q7)
+
+app = QApplication([])
+my_win = QWidget()
+my_win.setWindowTitle("Memory Card")
+my_win.move(500, 400)
+my_win.resize(400, 200)
+
+line = QVBoxLayout()
+
+vop = QLabel('Какой национальности не существует?')
+h_line_1 = QHBoxLayout()
+h_line_1.addWidget(vop, alignment = Qt.AlignCenter)
+line.addLayout(h_line_1)
+
+vop1 = QGroupBox('Варианты ответов')
+h_line_a = QHBoxLayout()
+h_line_a.addWidget(vop1, alignment = Qt.AlignCenter)
+line.addLayout(h_line_a)
+
+vop4 = QPushButton('Ответить')
+h_line_b = QHBoxLayout()
+h_line_b.addWidget(vop4, alignment = Qt.AlignCenter)
+line.addLayout(h_line_b)
+
+ot1 = QRadioButton('Энцы')
+ot2 = QRadioButton('Смурфы')
+ot3 = QRadioButton('Чульмцы')
+ot4 = QRadioButton('Алеуты')
+RadioGroup = QButtonGroup()
+RadioGroup.addButton(ot1)
+RadioGroup.addButton(ot2)
+RadioGroup.addButton(ot3)
+RadioGroup.addButton(ot4)
+
+v_line_g = QHBoxLayout()
+h_line_k = QVBoxLayout()
+v_line_h = QVBoxLayout()
+
+h_line_k.addWidget(ot1)
+h_line_k.addWidget(ot2)
+v_line_h.addWidget(ot3)
+v_line_h.addWidget(ot4 )
+
+v_line_g.addLayout(h_line_k)
+v_line_g.addLayout(v_line_h)
+vop1.setLayout(v_line_g)
+#2 часть - форма ответа
+otveti = QGroupBox('Результаты теста')
+otvet1 = QLabel('Правильный/Неправильно')
+otvet2 = QLabel('Правильный ответ')
+v_line_j = QVBoxLayout()
+
+v_line_j.addWidget(otvet1, alignment = Qt.AlignCenter)
+v_line_j.addWidget(otvet2, alignment = Qt.AlignCenter)
+otveti.setLayout(v_line_j)
+h_line_a.addWidget(otveti)
+otveti.hide()
+
+def show_result():
+    vop1.hide()
+    otveti.show()
+    vop4.setText('Следующий вопрос')
+
+def show_question():
+    vop1.show()
+    otveti.hide()
+    vop4.setText('Ответить')
+    RadioGroup.setExclusive(False)
+    ot1.setChecked(False)
+    ot2.setChecked(False)
+    ot3.setChecked(False)
+    ot4.setChecked(False)
+    RadioGroup.setExclusive(True)
+
+answers = [ot1, ot2, ot3, ot4]
+def ask(q: Question):
+    shuffle(answers)
+    answers[0].setText(q.right_answer)
+    answers[1].setText(q.wrong1)
+    answers[2].setText(q.wrong2)
+    answers[3].setText(q.wrong3)
+    vop.setText(q.question)
+    otvet2.setText(q.right_answer)
+    show_question()
+
+def check_answer():
+    if answers[0].isChecked():
+        otvet1.setText('Правильно')
+        show_result()
+        my_win.score +=1
+    elif answers[1].isChecked() or answers[2].isChecked() or answers[3].isChecked():
+        otvet1.setText('Неправильно')
+        show_result()
+    print('Всего вопросов:', my_win.total, '#Правильных ответов', my_win.score, '#Рейтинг', my_win.score / my_win.total * 100)
+def click_OK():
+    if vop4.text() == 'Ответить':
+        check_answer()
+    else:
+        next_question()
+
+def next_question():
+    my_win.total += 1
+    my_win.cur_question = randint(0, len(question_list) -1)
+    
+    q = question_list[my_win.cur_question]
+    ask(q)
+
+my_win.setLayout(line)
+
+my_win.score = 0 #количество верных ответов
+my_win.total = 0 #количество заданых вопросов
+vop4.clicked.connect(click_OK)
+next_question()
+
+my_win.show()
+app.exec()
